@@ -1,6 +1,7 @@
 from pathlib import Path, PurePosixPath
 
 from .blog import Blog
+from .null import Null
 from .pages import Pages
 
 import yaml
@@ -12,6 +13,7 @@ def load(path):
 
 _MODULES = {
     'blog': Blog,
+    'null': Null,
     'pages': Pages,
 }
 
