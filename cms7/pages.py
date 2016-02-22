@@ -11,10 +11,9 @@ class Page:
         self.title = meta_get_one(source.meta, 'title')
         self.template = meta_get_one(source.meta, 'template', 'page.html')
 
-    def render(self, gen, env):
-        template = env.get_template(self.template)
-        html = self.source.render(gen)
-        return template.render(title=self.title, content=html)
+    def render(self, gs):
+        html = self.source.render(gs)
+        return gs.render_template(self.template, title=self.title, content=html)
 
 
 class Pages(ProcessorModule):

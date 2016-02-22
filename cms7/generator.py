@@ -28,7 +28,7 @@ class Generator:
     def run(self):
         for target, generator in self.pages.values():
             logger.info('Rendering %s', target)
-            data = generator(self, self.env)
+            data = generator(GeneratorState(self, target))
             with self.open_target(target.with_suffix('.html')) as f:
                 f.write(data)
 

@@ -17,8 +17,8 @@ class Article:
         self.source = source
 
     def render(self, gs):
-        html = self.source.render(gs)
-        return gs.render_template(self.blog.template, title=self.title, content=html)
+        self.content = self.source.render(gs)
+        return gs.render_template(self.blog.template, article=self)
 
 
 class Blog(ProcessorModule):
@@ -38,7 +38,7 @@ class Blog(ProcessorModule):
             name = p.relative_to(self.source).with_suffix('')
             source = load_source(p)
             self.articles.append(Article(self, name, source))
-        self.articles.sort()
+        self.articles.sort(key=lambda a: a.datetime)
         for n, a in enumerate(self.articles):
             a.index = n
 
