@@ -19,6 +19,8 @@ def main_(*, config: 'c' = 'config.yml'):
     for m in cfg.modules():
         m.run(gen)
     gen.run()
+    for r in cfg.resources:
+        r.run()
 
 
 def compile_theme(theme, target, *, zip_=False):

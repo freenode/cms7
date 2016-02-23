@@ -1,5 +1,7 @@
 from pathlib2 import Path, PurePosixPath
 
+from .resources import Resource
+
 from .modules.blog import Blog
 from .modules.faq import Faq
 from .modules.null import Null
@@ -42,6 +44,15 @@ class Config:
             self.compiled_theme = dir_ / data['compiled-theme']
         else:
             self.compiled_theme = None
+
+        self.resources = []
+        for r in data.get('resources', []):
+            command = r['command']
+            source = Path(r['source'])
+            output = Path(r['output'])
+            suffix = r.get('ext', None)
+            recursive = r.get('recursive', False)
+            self.resources.append(Resource(command, source, output, suffix, recursive))
 
         self.module_id = {}
 
