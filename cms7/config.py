@@ -1,8 +1,8 @@
 from pathlib import Path, PurePosixPath
 
-from .blog import Blog
-from .null import Null
-from .pages import Pages
+from .modules.blog import Blog
+from .modules.null import Null
+from .modules.pages import Pages
 
 import yaml
 

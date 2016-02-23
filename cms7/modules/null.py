@@ -1,6 +1,6 @@
 from pathlib import PurePosixPath
 
-from .base_module import Module
+from . import Module
 
 class Null(Module):
     def __init__(self, *a, map, **kw):

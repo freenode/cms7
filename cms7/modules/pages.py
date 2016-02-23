@@ -1,6 +1,6 @@
-from .base_module import ProcessorModule
-from .source import load_source
-from .util import meta_get_one
+from . import ProcessorModule
+from ..source import load_source
+from ..util import meta_get_one
 
 
 class Page:
