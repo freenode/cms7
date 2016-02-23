@@ -4,7 +4,10 @@ from .modules.blog import Blog
 from .modules.null import Null
 from .modules.pages import Pages
 
+import logging
 import yaml
+
+logger = logging.getLogger(__name__)
 
 def load(path):
     with open(path, 'r') as f:
@@ -28,6 +31,9 @@ class Config:
         self.basedir  = PurePosixPath(data.get('basedir', '/'))
         self.output   = Path(data.get('output', 'out'))
 
+        self.output.mkdir(exist_ok=True)
+        logger.info('Outputting to %s', self.output.resolve())
+
         if 'compiled-theme' in data:
             self.compiled_theme = d / data['compiled-theme']
         else:
@@ -41,6 +47,7 @@ class Config:
             _id = None
             if 'id' in m:
                 _id = m.pop('id')
+            logger.info('Loading module: %s', name)
             module = _MODULES[name](self, d, **m)
             if _id is not None:
                 self.module_id[_id] = module
