@@ -13,6 +13,7 @@ setup(
         'jinja2',
         'markdown',
         'pathlib2',
+        'python-dateutil',
         'pyyaml',
     ],
     entry_points={
