@@ -1,6 +1,6 @@
 import logging
 
-from pathlib import Path
+from pathlib import PurePosixPath
 
 class Module:
     def __init__(self, cfg, dir_):
@@ -23,7 +23,7 @@ class ProcessorModule(Module):
         super().__init__(*a, **kw)
 
         self.source = self._dir / source
-        self.root = Path(root)
+        self.root = PurePosixPath(root)
 
         self.sources = list(self.source.iterdir())
 
