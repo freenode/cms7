@@ -63,6 +63,10 @@ class ArticleWrapper:
         self.gs = gs
         self.article = article
 
+    @property
+    def url(self):
+        return self.gs.url_for(self.name)
+
     def render(self):
         return self.source.render(self.gs)
 
