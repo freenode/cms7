@@ -11,6 +11,7 @@ class Article:
     def __init__(self, blog, name, source):
         self.blog = blog
         self.name = name
+        self.author = meta_get_one(source.meta, 'author')
         self.datetime = parser.parse(meta_get_one(source.meta, 'date'))
         self.title = meta_get_one(source.meta, 'title')
         self.slug = meta_get_one(source.meta, 'slug', name.relative_to(self.blog.source))
