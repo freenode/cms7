@@ -24,20 +24,22 @@ _MODULES = {
 
 class Config:
     @classmethod
-    def load_from_file(cls, f, d):
+    def load_from_file(cls, f, dir_):
         self = cls()
         data = yaml.load(f)
 
         self.name     = data['name']
-        self.theme    = d / data.get('theme', 'theme')
+        self.theme    = dir_ / data.get('theme', 'theme')
         self.basedir  = PurePosixPath(data.get('basedir', '/'))
         self.output   = Path(data.get('output', 'out'))
+
+        self.content_root = dir_ / data.get('content-root', '.')
 
         self.output.mkdir(exist_ok=True)
         logger.info('Outputting to %s', self.output.resolve())
 
         if 'compiled-theme' in data:
-            self.compiled_theme = d / data['compiled-theme']
+            self.compiled_theme = dir_ / data['compiled-theme']
         else:
             self.compiled_theme = None
 
@@ -50,7 +52,7 @@ class Config:
             if 'id' in m:
                 _id = m.pop('id')
             logger.info('Loading module: %s', name)
-            module = _MODULES[name](self, d, **m)
+            module = _MODULES[name](self, self.content_root, **m)
             if _id is not None:
                 self.module_id[_id] = module
             self._modules.append(module)
