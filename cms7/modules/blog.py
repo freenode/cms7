@@ -45,3 +45,25 @@ class Blog(ProcessorModule):
     def run(self, gen):
         for a in self.articles:
             gen.add_render(a.name, self.root / a.slug, a.render)
+
+    def get_api(self, gs):
+        return BlogAPI(self, gs)
+
+
+class BlogAPI:
+    def __init__(self, blog, gs):
+        self.blog = blog
+        self.gs = gs
+        self.articles = [ArticleWrapper(gs, a) for a in self.blog.articles]
+
+
+class ArticleWrapper:
+    def __init__(self, gs, article):
+        self.gs = gs
+        self.article = article
+
+    def render(self):
+        return self.source.render(self.gs)
+
+    def __getattr__(self, k):
+        return getattr(self.article, k)
