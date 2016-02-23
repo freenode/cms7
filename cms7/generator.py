@@ -26,7 +26,7 @@ class Generator:
         return p.open('w')
 
     def run(self):
-        for link, v in self.pages.items():
+        for link, v in sorted(self.pages.items(), key=lambda x: str(x[0])):
             target, generator = v
             tf = target.with_suffix('.html')
             logger.info('Rendering %s -> %s', link, tf)
