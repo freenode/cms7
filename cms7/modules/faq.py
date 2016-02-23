@@ -12,7 +12,7 @@ class FaqEntry:
         self.faq = faq
         self.name = name
         self.title = meta_get_one(source.meta, 'title')
-        self.slug = meta_get_one(source.meta, 'slug', name.stem)
+        self.slug = meta_get_one(source.meta, 'slug', name.name)
         self.template = meta_get_one(source.meta, 'template', 'faq.html')
         self.source = source
 
@@ -53,7 +53,7 @@ class Faq(Module):
             if d.is_dir():
                 for s in d.iterdir():
                     source = load_source(s)
-                    entry = FaqEntry(self, s.with_suffix(''), source)
+                    entry = FaqEntry(self, self.path_to_name(s), source)
                     self.cats.setdefault(d.name, set()).add(entry)
         self.log(logging.INFO, 'Found %d sources in %s (%d subdirs)',
                  sum(map(len, self.cats.values())), self.source.resolve(), len(self.cats))

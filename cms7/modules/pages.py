@@ -7,7 +7,7 @@ class Page:
     def __init__(self, parent, name, source):
         self.source = source
         self.name = name
-        self.slug = meta_get_one(source.meta, 'slug', name.relative_to(parent.source))
+        self.slug = meta_get_one(source.meta, 'slug', name.name)
         self.title = meta_get_one(source.meta, 'title')
         self.template = meta_get_one(source.meta, 'template', 'page.html')
 
@@ -24,7 +24,7 @@ class Pages(ProcessorModule):
 
     def prepare(self):
         for p in self.sources:
-            name = p.with_suffix('')
+            name = self.path_to_name(p)
             source = load_source(p)
             self.pages[name] = Page(self, name, source)
 

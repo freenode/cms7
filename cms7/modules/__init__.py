@@ -8,6 +8,9 @@ class Module:
         self.config = cfg
         self._logger = logging.getLogger(self.__class__.__module__)
 
+    def path_to_name(self, p):
+        return p.relative_to(self._dir).with_suffix('')
+
     def log(self, lvl, msg, *a, **kw):
         self._logger.log(lvl, msg, *a, **kw)
 

@@ -25,7 +25,7 @@ class Generator:
         location = location.parent
         suffix = None
         try:
-            target = self.pages[name][0]
+            target = self.pages[str(name)][0]
             logger.debug('look up for %s: %s', name, target)
             suffix = '.html'
         except KeyError as e:
@@ -62,13 +62,15 @@ class GeneratorState:
         self.gen = gen
         self.targetpath = targetpath
 
+    def url_for(self, name):
+        return self.gen.build_url(self.targetpath, name)
+
+    def get_module(self, name):
+        return self.gen.config.module_id[name].get_api(self)
+
     def render_template(self, template, **kw):
         template = self.gen.env.get_template(template)
-        def url_for(name):
-            return self.gen.build_url(self.targetpath, name)
-        def get_module(name):
-            return self.gen.config.module_id[name].get_api(self)
         return template.render(config=self.gen.config,
-                               url_for=url_for,
-                               get_module=get_module,
+                               url_for=self.url_for,
+                               get_module=self.get_module,
                                **kw)
