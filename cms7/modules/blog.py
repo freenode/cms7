@@ -13,12 +13,12 @@ class Article:
         self.name = name
         self.datetime = parser.parse(meta_get_one(source.meta, 'date'))
         self.title = meta_get_one(source.meta, 'title')
-        self.slug = meta_get_one(source.meta, 'slug', name)
+        self.slug = meta_get_one(source.meta, 'slug', name.relative_to(self.blog.source))
         self.source = source
 
     def render(self, gs):
         self.content = self.source.render(gs)
-        return gs.render_template(self.blog.template, article=self)
+        return gs.render_template(self.blog.template, title=self.title, article=self)
 
 
 class Blog(ProcessorModule):
@@ -35,7 +35,7 @@ class Blog(ProcessorModule):
 
     def prepare(self):
         for p in self.sources:
-            name = p.relative_to(self.source).with_suffix('')
+            name = p.with_suffix('')
             source = load_source(p)
             self.articles.append(Article(self, name, source))
         self.articles.sort(key=lambda a: a.datetime)
