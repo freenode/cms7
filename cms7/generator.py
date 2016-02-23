@@ -26,8 +26,10 @@ class Generator:
         return p.open('w')
 
     def run(self):
-        for target, generator in self.pages.values():
-            logger.info('Rendering %s', target)
+        for link, v in self.pages.items():
+            target, generator = v
+            tf = target.with_suffix('.html')
+            logger.info('Rendering %s -> %s', link, tf)
             data = generator(GeneratorState(self, target))
             with self.open_target(target.with_suffix('.html')) as f:
                 f.write(data)
