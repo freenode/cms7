@@ -14,7 +14,9 @@ class Generator:
         loaders = [FileSystemLoader(str(self.config.theme))]
         if self.config.compiled_theme is not None:
             loaders.append(ModuleLoader(str(self.config.compiled_theme)))
-        self.env = Environment(loader=ChoiceLoader(loaders), undefined=StrictUndefined)
+        self.env = Environment(loader=ChoiceLoader(loaders),
+                               undefined=StrictUndefined,
+                               extensions=['jinja2.ext.with_'])
 
     def add_render(self, link, target, generator):
         self.pages[str(link)] = (target, generator)
