@@ -17,17 +17,28 @@ class Generator:
         self.env = Environment(loader=ChoiceLoader(loaders), undefined=StrictUndefined)
 
     def add_render(self, link, target, generator):
-        self.pages[link] = (target, generator)
+        self.pages[str(link)] = (target, generator)
 
     def build_url(self, location, name):
-        target = self.pages[name][0]
+        location = location.parent
+        suffix = None
+        try:
+            target = self.pages[name][0]
+            logger.debug('look up for %s: %s', name, target)
+            suffix = '.html'
+        except KeyError as e:
+            logger.debug('look up for %s: %r', name, e)
+            target = PurePosixPath(name)
         n = 0
         for a, b in zip(location.parts, target.parts):
             if a != b:
                 break
             n += 1
-        newpath = ['..'] * (len(location.parts) - n) + target.parts[n:]
-        return PurePosixPath(*newpath)
+        newpath = ('..',) * (len(location.parts) - n) + target.parts[n:]
+        p = PurePosixPath(*newpath)
+        if suffix is not None:
+            p = p.with_suffix(suffix)
+        return p
 
     def open_target(self, path):
         p = self.config.output / path
