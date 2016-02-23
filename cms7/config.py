@@ -25,7 +25,7 @@ class Config:
 
         self.name     = data['name']
         self.theme    = d / data.get('theme', 'theme')
-        self.basedir  = PurePosixPath(data.get('basedor', '/'))
+        self.basedir  = PurePosixPath(data.get('basedir', '/'))
         self.output   = Path(data.get('output', 'out'))
 
         if 'compiled-theme' in data:
