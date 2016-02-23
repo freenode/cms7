@@ -1,4 +1,4 @@
-from pathlib import PurePosixPath
+from pathlib2 import PurePosixPath
 
 import logging
 

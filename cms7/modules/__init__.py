@@ -1,6 +1,6 @@
 import logging
 
-from pathlib import PurePosixPath
+from pathlib2 import PurePosixPath
 
 class Module:
     def __init__(self, cfg, dir_):

@@ -12,6 +12,7 @@ setup(
         'clize',
         'jinja2',
         'markdown',
+        'pathlib2',
         'pyyaml',
     ],
     entry_points={

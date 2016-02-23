@@ -1,4 +1,4 @@
-from pathlib import Path, PurePosixPath
+from pathlib2 import Path, PurePosixPath
 
 from .modules.blog import Blog
 from .modules.faq import Faq
