@@ -19,7 +19,7 @@ class Resource:
                 if self.recursive:
                     l.extend(f.iterdir())
                 continue
-            dest = self.output / f.name
+            dest = self.output / f.relative_to(self.source)
             if self.suffix is not None:
                 dest = dest.with_suffix(self.suffix)
             dest.parent.mkdir(parents=True, exist_ok=True)
