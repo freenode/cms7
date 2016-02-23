@@ -1,6 +1,7 @@
 from pathlib import Path, PurePosixPath
 
 from .modules.blog import Blog
+from .modules.faq import Faq
 from .modules.null import Null
 from .modules.pages import Pages
 
@@ -16,6 +17,7 @@ def load(path):
 
 _MODULES = {
     'blog': Blog,
+    'faq': Faq,
     'null': Null,
     'pages': Pages,
 }
