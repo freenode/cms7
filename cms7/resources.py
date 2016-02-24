@@ -4,12 +4,13 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 class Resource:
-    def __init__(self, command, source, output, suffix=None, recursive=False):
+    def __init__(self, command, source, output, suffix=None, recursive=False, pattern='*'):
         self.command = command
         self.source = source
         self.output = output
         self.suffix = suffix
         self.recursive = recursive
+        self.pattern = pattern
 
     def run(self):
         l = list(self.source.iterdir())
@@ -18,6 +19,8 @@ class Resource:
             if f.is_dir():
                 if self.recursive:
                     l.extend(f.iterdir())
+                continue
+            if not f.match(self.pattern):
                 continue
             dest = self.output / f.relative_to(self.source)
             if self.suffix is not None:

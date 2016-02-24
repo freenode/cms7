@@ -52,7 +52,8 @@ class Config:
             output = Path(r['output'])
             suffix = r.get('ext', None)
             recursive = r.get('recursive', False)
-            self.resources.append(Resource(command, source, output, suffix, recursive))
+            pattern = r.get('pattern', '*')
+            self.resources.append(Resource(command, source, output, suffix, recursive, pattern))
 
         self.module_id = {}
 
