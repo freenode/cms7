@@ -26,6 +26,13 @@ class Resource:
             if self.suffix is not None:
                 dest = dest.with_suffix(self.suffix)
             dest.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                if dest.stat().st_mtime > f.stat().st_mtime:
+                    logger.info('skip %s', dest)
+                    continue
+            except FileNotFoundError:
+                pass
+
             with f.open('rb') as in_, dest.open('wb') as out:
                 logger.info('%s <%s >%s', ' '.join(self.command), f, dest)
                 r = subprocess.call(self.command, stdin=in_, stdout=out)
