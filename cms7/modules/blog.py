@@ -67,6 +67,24 @@ class ArticleWrapper:
     def url(self):
         return self.gs.url_for(self.name)
 
+    @property
+    def newer(self):
+        try:
+            return ArticleWrapper(self.gs,
+                    self.blog.articles[self.index + 1])
+        except IndexError:
+            return None
+
+    @property
+    def older(self):
+        if self.index == 0:
+            return None
+        try:
+            return ArticleWrapper(self.gs,
+                    self.blog.articles[self.index - 1])
+        except IndexError:
+            return None
+
     def render(self):
         return self.source.render(self.gs)
 
