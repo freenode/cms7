@@ -18,8 +18,8 @@ class Article:
         self.source = source
 
     def render(self, gs):
-        self.content = self.source.render(gs)
-        return gs.render_template(self.blog.template, title=self.title, article=self)
+        this = ArticleWrapper(gs, self)
+        return gs.render_template(self.blog.template, article=this)
 
 
 class Blog(ProcessorModule):
