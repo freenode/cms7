@@ -14,7 +14,8 @@ class Generator:
         loaders = [FileSystemLoader(str(self.config.theme))]
         if self.config.compiled_theme is not None:
             loaders.append(ModuleLoader(str(self.config.compiled_theme)))
-        self.env = Environment(loader=ChoiceLoader(loaders),
+        self.env = Environment(autoescape=True,
+                               loader=ChoiceLoader(loaders),
                                undefined=StrictUndefined,
                                extensions=['jinja2.ext.with_'])
 
