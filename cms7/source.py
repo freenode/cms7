@@ -4,6 +4,10 @@ from markdown.extensions.wikilinks import WikiLinkExtension
 
 from markupsafe import Markup
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def load_source(path):
     return MarkdownSource(path)
 
@@ -13,8 +17,15 @@ class Namespace:
 class MarkdownSource:
     def __init__(self, source):
         self.source = source
+        self.text = ''
         with self.open_source() as f:
-            self.text = f.read()
+            try:
+                self.text = f.read()
+            except UnicodeDecodeError:
+                logger.error('Invalid unicode in %s', self.source, exc_info=True)
+            except:
+                logger.error('Error loading %s', self.source, exc_info=True)
+
         self.meta = self.read_metadata()
 
     def read_metadata(self):
