@@ -13,8 +13,8 @@ import yaml
 logger = logging.getLogger(__name__)
 
 def load(path):
-    c = Config.load_from_file(Path(path), Path(path).parent)
-    return c
+    return Config.load_from_file(Path(path), Path(path).parent)
+
 
 _MODULES = {
     'blog': Blog,
@@ -23,11 +23,11 @@ _MODULES = {
     'pages': Pages,
 }
 
+
 class IncludeLoader(yaml.Loader):
     def __init__(self, stream, name):
         self.__name = Path(name).parent
         super().__init__(stream)
-
 
     @classmethod
     def load(cls, path):
