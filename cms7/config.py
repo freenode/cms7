@@ -69,7 +69,12 @@ class Config:
                 self.module_id[_id] = module
             self._modules.append(module)
 
+        self._data = data
+
         return self
 
     def modules(self):
         yield from self._modules
+
+    def __getitem__(self, k):
+        return self._data[k]
