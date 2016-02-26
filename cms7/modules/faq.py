@@ -102,6 +102,8 @@ class Faq(Module):
         for d in self.source.iterdir():
             if d.is_dir():
                 for s in d.iterdir():
+                    if self.is_ignored(s):
+                        continue
                     source = load_source(s)
                     name = self.path_to_name(s)
                     entry = FaqEntry(self, name, source)

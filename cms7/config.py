@@ -58,6 +58,8 @@ class Config:
 
         self.content_root = dir_ / data.get('content-root', '.')
 
+        self.ignore   = data.get('ignore', [])
+
         self.output.mkdir(exist_ok=True)
         logger.info('Outputting to %s', self.output.resolve())
 
