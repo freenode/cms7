@@ -27,11 +27,18 @@ class Generator:
         suffix = None
         try:
             target = self.pages[str(name)][0]
-            logger.debug('look up for %s: %s', name, target)
+            logger.debug('look up for %s: rendered output: %s', name, target)
             suffix = '.html'
-        except KeyError as e:
-            logger.debug('look up for %s: %r', name, e)
-            target = PurePosixPath(name)
+        except KeyError:
+            for r in self.config.resources:
+                t = r.lookup_target(str(name))
+                if t is not None:
+                    target = t
+                    logger.debug('look up for %s: resources: %s', name, target)
+                    break
+            else:
+                logger.warning('look up for %s: nothing found!', name)
+                target = PurePosixPath(name)
         n = 0
         for a, b in zip(location.parts, target.parts):
             if a != b:

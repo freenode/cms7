@@ -6,7 +6,8 @@ from .error import CMS7Error
 logger = logging.getLogger(__name__)
 
 class Resource:
-    def __init__(self, command, source, output, suffix=None, recursive=False, pattern='*'):
+    def __init__(self, config, command, source, output, suffix=None, recursive=False, pattern='*'):
+        self.config = config
         self.command = command
         self.source = source
         self.output = output
@@ -14,7 +15,10 @@ class Resource:
         self.recursive = recursive
         self.pattern = pattern
 
-    def run(self):
+        self.map_ = {}
+        self.prepare()
+
+    def prepare(self):
         l = list(self.source.iterdir())
         while len(l) > 0:
             f = l.pop(0)
@@ -27,6 +31,10 @@ class Resource:
             dest = self.output / f.relative_to(self.source)
             if self.suffix is not None:
                 dest = dest.with_suffix(self.suffix)
+            self.map_[str(f)] = (f, dest)
+
+    def run(self):
+        for f, dest in self.map_.values():
             dest.parent.mkdir(parents=True, exist_ok=True)
             try:
                 if dest.stat().st_mtime > f.stat().st_mtime:
@@ -40,3 +48,10 @@ class Resource:
                 r = subprocess.call(self.command, stdin=in_, stdout=out)
                 if r != 0:
                     raise CMS7Error('build step ({}) failed: {}'.format(' '.join(self.command), r))
+
+    def lookup_target(self, n):
+        p = self.map_.get(n, None)
+        if p is None:
+            return None
+        src, dst = p
+        return dst.relative_to(self.config.output)
