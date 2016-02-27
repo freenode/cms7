@@ -2,10 +2,11 @@ from markdown import Markdown
 from markdown.extensions.meta import MetaExtension, MetaPreprocessor
 from markdown.extensions.wikilinks import WikiLinkExtension
 
-from markupsafe import Markup
+from jinja2 import Markup
+
+from .mdext import CMS7Extension
 
 import logging
-
 logger = logging.getLogger(__name__)
 
 def load_source(path):
@@ -34,9 +35,9 @@ class MarkdownSource:
         mp.run(self.text.split('\n'))
         return ns.Meta
 
-    def render(self, gen):
+    def render(self, gs):
         md = Markdown(extensions=[
-            MetaExtension(), WikiLinkExtension()],
+            MetaExtension(), WikiLinkExtension(), CMS7Extension(gs)],
             output_format='html5')
         return Markup(md.convert(self.text))
 

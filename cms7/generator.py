@@ -39,7 +39,7 @@ class Generator:
                     break
             else:
                 logger.warning('look up for %s: nothing found!', name)
-                return self.env.undefined('url_for({!r})'.format(str(name)))
+                return None
         n = 0
         for a, b in zip(location.parts, target.parts):
             if a != b:
@@ -63,6 +63,9 @@ class Generator:
             logger.info('Rendering %s -> %s', link, tf)
             try:
                 data = generator(GeneratorState(self, target))
+            except CMS7Error:
+                logger.critical('fatal error while rendering %r', link)
+                raise
             except Exception as e:
                 raise CMS7Error('{} while rendering {!r}'.format(type(e).__name__, link)) from e
             with self.open_target(target.with_suffix('.html')) as f:
@@ -75,7 +78,8 @@ class GeneratorState:
         self.targetpath = targetpath
 
     def url_for(self, name):
-        return self.gen.build_url(self.targetpath, name)
+        return self.gen.build_url(self.targetpath, name) or \
+                self.env.undefined('url_for({!r})'.format(str(name)))
 
     def get_module(self, name):
         return self.gen.config.module_id[name].get_api(self)
