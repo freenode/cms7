@@ -1,5 +1,6 @@
 from pathlib2 import Path, PurePosixPath
 
+from .error import CMS7Error
 from .resources import Resource
 
 from .modules.blog import Blog
@@ -51,46 +52,55 @@ class Config:
         self = cls()
         data = IncludeLoader.load(f)
 
-        self.name     = data['name']
-        self.theme    = dir_ / data.get('theme', 'theme')
-        self.basedir  = PurePosixPath(data.get('basedir', '/'))
-        self.output   = Path(data.get('output', 'out'))
+        try:
+            self.name     = data['name']
+            self.theme    = dir_ / data.get('theme', 'theme')
+            self.basedir  = PurePosixPath(data.get('basedir', '/'))
+            self.output   = Path(data.get('output', 'out'))
 
-        self.content_root = dir_ / data.get('content-root', '.')
+            self.content_root = dir_ / data.get('content-root', '.')
 
-        self.ignore   = data.get('ignore', [])
+            self.ignore   = data.get('ignore', [])
 
-        self.output.mkdir(exist_ok=True)
-        logger.info('Outputting to %s', self.output.resolve())
+            self.output.mkdir(exist_ok=True)
+            logger.info('Outputting to %s', self.output.resolve())
 
-        if 'compiled-theme' in data:
-            self.compiled_theme = dir_ / data['compiled-theme']
-        else:
-            self.compiled_theme = None
+            if 'compiled-theme' in data:
+                self.compiled_theme = dir_ / data['compiled-theme']
+            else:
+                self.compiled_theme = None
 
-        self.resources = []
-        for r in data.get('resources', []):
-            command = r['command']
-            source = Path(r['source'])
-            output = Path(r['output'])
-            suffix = r.get('ext', None)
-            recursive = r.get('recursive', False)
-            pattern = r.get('pattern', '*')
-            self.resources.append(Resource(command, source, output, suffix, recursive, pattern))
+            self.resources = []
+            for r in data.get('resources', []):
+                try:
+                    command = r['command']
+                    source = Path(r['source'])
+                    output = Path(r['output'])
+                    suffix = r.get('ext', None)
+                    recursive = r.get('recursive', False)
+                    pattern = r.get('pattern', '*')
+                except KeyError as e:
+                    raise CMS7Error('resource missing required key {}'.format(e.args[0])) from e
+                self.resources.append(Resource(command, source, output, suffix, recursive, pattern))
 
-        self.module_id = {}
+            self.module_id = {}
 
-        self._modules = []
-        for m in data['modules']:
-            name = m.pop('name')
-            _id = None
-            if 'id' in m:
-                _id = m.pop('id')
-            logger.info('Loading module: %s', name)
-            module = _MODULES[name](self, self.content_root, **m)
-            if _id is not None:
-                self.module_id[_id] = module
-            self._modules.append(module)
+            self._modules = []
+            for m in data['modules']:
+                name = m.pop('name')
+                _id = None
+                if 'id' in m:
+                    _id = m.pop('id')
+                if name not in _MODULES:
+                    raise CMS7Error('unknown module: {!r}'.format(name))
+                logger.info('Loading module: %s', name)
+                module = _MODULES[name](self, self.content_root, **m)
+                if _id is not None:
+                    self.module_id[_id] = module
+                self._modules.append(module)
+
+        except KeyError as e:
+            raise CMS7Error('config missing required key {}'.format(e.args[0])) from e
 
         self._data = data
 

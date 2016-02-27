@@ -9,6 +9,7 @@ setup(
     url='',
     packages=['cms7'],
     install_requires=[
+        'colorlog',
         'clize',
         'jinja2',
         'markdown',

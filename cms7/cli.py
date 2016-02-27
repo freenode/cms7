@@ -3,24 +3,58 @@ import logging
 from clize import run
 
 from . import config as _config
+from .error import CMS7Error
 from .generator import Generator
 
+logger = logging.getLogger('cms7')
 
-def main_(*, config: 'c' = 'config.yml'):
+
+def main_(*, config: 'c' = 'config.yml', debug: 'd' = False, quiet: 'q' = False):
     """
     Run cms7.
 
     config: Path to site configuration
     """
-    cfg = _config.load(config)
-    gen = Generator(cfg)
-    for m in cfg.modules():
-        m.prepare()
-    for m in cfg.modules():
-        m.run(gen)
-    gen.run()
-    for r in cfg.resources:
-        r.run()
+
+    rl = logging.getLogger()
+    h = logging.StreamHandler()
+    try:
+        import colorlog
+        h.setFormatter(colorlog.ColoredFormatter(
+            "%(log_color)s%(levelname)-8s%(reset)s %(message_log_color)s%(name)s:%(message)s",
+            secondary_log_colors={
+                'message': {
+                    'WARNING':  'yellow',
+                    'ERROR':    'red',
+                    'CRITICAL': 'red',
+                }
+            }))
+    except ImportError:
+        h.setFormatter(logging.Formatter(
+            "%(levelname)-8s %(name)s:%(message)s"))
+    rl.addHandler(h)
+
+    if debug:
+        rl.setLevel(logging.DEBUG)
+    elif quiet:
+        rl.setLevel(logging.WARNING)
+    else:
+        rl.setLevel(logging.INFO)
+
+    try:
+        cfg = _config.load(config)
+        gen = Generator(cfg)
+        for m in cfg.modules():
+            m.prepare()
+        for m in cfg.modules():
+            m.run(gen)
+        gen.run()
+        for r in cfg.resources:
+            r.run()
+    except CMS7Error as e:
+        logger.critical('%s', e.message, exc_info=debug)
+    except Exception:
+        logger.critical('unexpected exception', exc_info=True)
 
 
 def compile_theme(theme, target, *, zip_=False):
@@ -39,5 +73,4 @@ def compile_theme(theme, target, *, zip_=False):
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
     run(main_, alt=[compile_theme])

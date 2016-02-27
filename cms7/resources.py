@@ -1,6 +1,8 @@
 import logging
 import subprocess
 
+from .error import CMS7Error
+
 logger = logging.getLogger(__name__)
 
 class Resource:
@@ -37,5 +39,4 @@ class Resource:
                 logger.info('%s <%s >%s', ' '.join(self.command), f, dest)
                 r = subprocess.call(self.command, stdin=in_, stdout=out)
                 if r != 0:
-                    logger.error('%r: failed! (%d)', self.command, r)
-                    raise Exception
+                    raise CMS7Error('build step ({}) failed: {}'.format(' '.join(self.command), r))
