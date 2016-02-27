@@ -53,6 +53,8 @@ def main_(*, config: 'c' = 'config.yml', debug: 'd' = False, quiet: 'q' = False)
             r.run()
     except CMS7Error as e:
         logger.critical('%s', e.message, exc_info=debug)
+        if not debug:
+            logger.warning('exiting for exception. use --debug to get a traceback')
     except Exception:
         logger.critical('unexpected exception', exc_info=True)
 

@@ -61,7 +61,10 @@ class Generator:
             target, generator = v
             tf = target.with_suffix('.html')
             logger.info('Rendering %s -> %s', link, tf)
-            data = generator(GeneratorState(self, target))
+            try:
+                data = generator(GeneratorState(self, target))
+            except Exception as e:
+                raise CMS7Error('{} while rendering {!r}'.format(type(e).__name__, link)) from e
             with self.open_target(target.with_suffix('.html')) as f:
                 f.write(data)
 
