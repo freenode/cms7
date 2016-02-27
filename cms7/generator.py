@@ -1,8 +1,9 @@
 from pathlib2 import PurePosixPath
-
 import logging
 
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, ModuleLoader, StrictUndefined
+
+from .error import CMS7Error
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class Generator:
                     break
             else:
                 logger.warning('look up for %s: nothing found!', name)
-                target = PurePosixPath(name)
+                return self.env.undefined('url_for({!r})'.format(str(name)))
         n = 0
         for a, b in zip(location.parts, target.parts):
             if a != b:
