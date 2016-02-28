@@ -13,8 +13,8 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-def load(path):
-    return Config.load_from_file(Path(path), Path(path).parent)
+def load(path, *extra):
+    return Config.load_from_file(Path(path), Path(path).parent, map(Path, extra))
 
 
 _MODULES = {
@@ -48,9 +48,12 @@ IncludeLoader.add_constructor('!include', IncludeLoader.include)
 
 class Config:
     @classmethod
-    def load_from_file(cls, f, dir_):
+    def load_from_file(cls, f, dir_, extra=()):
         self = cls()
         data = IncludeLoader.load(f)
+
+        for p in extra:
+            data.update(IncludeLoader.load(p))
 
         try:
             self.name     = data['name']

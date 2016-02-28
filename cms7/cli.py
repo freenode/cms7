@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from clize import run
+from clize import run, parameters
 
 from . import config as _config
 from .error import CMS7Error
@@ -10,11 +10,22 @@ from .generator import Generator
 logger = logging.getLogger('cms7')
 
 
-def main_(*, config: 'c' = 'config.yml', debug: 'd' = False, quiet: 'q' = False):
+def main_(*,
+          config: 'c' = 'config.yml',
+          debug:  'd' = False,
+          quiet:  'q' = False,
+          extra:  ('e', str, parameters.multi()) = None):
     """
     Run cms7.
 
-    config: Path to site configuration
+    config: Path to project configuration
+
+    extra:  Path to additional configuration (e.g. site local overrides). Can
+            be specified multiple times. Later configurations override.
+
+    debug:  Print obnoxious debugging output
+
+    quiet:  Only ever print warnings
     """
 
     rl = logging.getLogger()
@@ -43,7 +54,7 @@ def main_(*, config: 'c' = 'config.yml', debug: 'd' = False, quiet: 'q' = False)
         rl.setLevel(logging.INFO)
 
     try:
-        cfg = _config.load(config)
+        cfg = _config.load(config, *extra)
         gen = Generator(cfg)
         for m in cfg.modules():
             m.prepare()
