@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from clize import run
 
@@ -55,8 +56,10 @@ def main_(*, config: 'c' = 'config.yml', debug: 'd' = False, quiet: 'q' = False)
         logger.critical('%s', e.message, exc_info=debug)
         if not debug:
             logger.warning('exiting for exception. use --debug to get a traceback')
+        sys.exit(1)
     except Exception:
         logger.critical('unexpected exception', exc_info=True)
+        sys.exit(1)
 
 
 def compile_theme(theme, target, *, zip_=False):
