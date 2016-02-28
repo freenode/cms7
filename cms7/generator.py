@@ -4,6 +4,7 @@ import logging
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, ModuleLoader, StrictUndefined
 
 from .error import CMS7Error
+from .util import is_relative_url
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,9 @@ class GeneratorState:
         self.gen = gen
         self.targetpath = targetpath
 
-    def url_for(self, name):
+    def url_for(self, name, *, ignore_absolute=False):
+        if ignore_absolute and not is_relative_url(str(name)):
+            return name
         return self.gen.build_url(self.targetpath, name) or \
                 self.gen.env.undefined('url_for({!r})'.format(str(name)))
 
