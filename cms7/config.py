@@ -58,7 +58,6 @@ class Config:
         try:
             self.name     = data['name']
             self.theme    = dir_ / data.get('theme', 'theme')
-            self.basedir  = PurePosixPath(data.get('basedir', '/'))
             self.output   = Path(data.get('output', 'out'))
 
             self.content_root = dir_ / data.get('content-root', '.')
