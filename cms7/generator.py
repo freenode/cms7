@@ -49,6 +49,8 @@ class Generator:
         p = PurePosixPath(*newpath)
         if suffix is not None:
             p = p.with_suffix(suffix)
+        if p.suffix == '.html' and self.config.htmlless:
+            p = p.with_suffix('')
         return p
 
     def open_target(self, path):

@@ -67,6 +67,8 @@ class Config:
             self.output.mkdir(exist_ok=True)
             logger.info('Outputting to %s', self.output.resolve())
 
+            self.htmlless = data.get('pretty-html', False)
+
             if 'compiled-theme' in data:
                 self.compiled_theme = dir_ / data['compiled-theme']
             else:
