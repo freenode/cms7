@@ -4,6 +4,9 @@ from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
 from markdown.util import STX
 
+import html5lib
+import xml.etree
+
 from .error import CMS7Error
 
 import logging
@@ -16,19 +19,30 @@ class CMS7Extension(Extension):
         super().__init__()
 
     def extendMarkdown(self, md, md_globals):
-        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(self.gs)
+        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs)
 
 
 class CMS7TreeProcessor(Treeprocessor):
-    def __init__(self, gs):
+    def __init__(self, md, gs):
         self.gs = gs
-        super().__init__()
+        super().__init__(md)
 
-    def run(self, root):
+    def process(self, root):
         for el in root.findall('.//a[@href]'):
+            self.fix_link(el, 'href')
+        for el in root.findall('.//{http://www.w3.org/1999/xhtml}a[@href]'):
             self.fix_link(el, 'href')
         for el in root.findall('.//*[@src]'):
             self.fix_link(el, 'src')
+
+    def run(self, root):
+        self.process(root)
+        for i in range(len(self.markdown.htmlStash.rawHtmlBlocks)):
+            html, safe = self.markdown.htmlStash.rawHtmlBlocks[i]
+            tree = html5lib.parse(html)
+            self.process(tree)
+            html = xml.etree.ElementTree.tostring(tree, method='html', encoding='unicode')
+            self.markdown.htmlStash.rawHtmlBlocks[i] = html, safe
 
     def fix_link(self, element, attribute):
         at = element.attrib[attribute]
@@ -36,6 +50,8 @@ class CMS7TreeProcessor(Treeprocessor):
             return
         url = urlparse(at)
         if url.scheme or url.netloc or url.params or url.path.startswith('/'):
+            return
+        if url.path == '':
             return
         link = self.gs.gen.build_url(self.gs.targetpath, url.path)
         if link is None:
