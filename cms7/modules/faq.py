@@ -11,9 +11,9 @@ class FaqEntry:
     def __init__(self, faq, name, source):
         self.faq = faq
         self.name = name
-        self.title = meta_get_one(source.meta, 'title')
-        self.slug = meta_get_one(source.meta, 'slug', name.name)
-        self.template = meta_get_one(source.meta, 'template', 'faq.html')
+        self.title = meta_get_one(source, 'title')
+        self.slug = meta_get_one(source, 'slug', name.name)
+        self.template = meta_get_one(source, 'template', 'faq.html')
         self.source = source
 
     def render(self, gs):

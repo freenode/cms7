@@ -7,9 +7,9 @@ class Page:
     def __init__(self, parent, name, source):
         self.source = source
         self.name = name
-        self.slug = meta_get_one(source.meta, 'slug', name.name)
-        self.title = meta_get_one(source.meta, 'title')
-        self.template = meta_get_one(source.meta, 'template', 'page.html')
+        self.slug = meta_get_one(source, 'slug', name.name)
+        self.title = meta_get_one(source, 'title')
+        self.template = meta_get_one(source, 'template', 'page.html')
 
     def render(self, gs):
         self.content = self.source.render(gs)

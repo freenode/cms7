@@ -11,10 +11,10 @@ class Article:
     def __init__(self, blog, name, source):
         self.blog = blog
         self.name = name
-        self.author = meta_get_one(source.meta, 'author')
-        self.datetime = parser.parse(meta_get_one(source.meta, 'date'))
-        self.title = meta_get_one(source.meta, 'title')
-        self.slug = meta_get_one(source.meta, 'slug', name.name)
+        self.author = meta_get_one(source, 'author')
+        self.datetime = parser.parse(meta_get_one(source, 'date'))
+        self.title = meta_get_one(source, 'title')
+        self.slug = meta_get_one(source, 'slug', name.name)
         self.source = source
 
     def render(self, gs):

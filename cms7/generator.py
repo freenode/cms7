@@ -67,9 +67,9 @@ class Generator:
             logger.info('Rendering %s -> %s', link, tf)
             try:
                 data = generator(GeneratorState(self, target))
-            except CMS7Error:
-                logger.critical('fatal error while rendering %r', link)
-                raise
+            except CMS7Error as e:
+                logger.error('fatal error while rendering %r', link)
+                logger.error(e.message)
             except Exception as e:
                 raise CMS7Error('{} while rendering {!r}'.format(type(e).__name__, link)) from e
             with self.open_target(target.with_suffix('.html')) as f:
