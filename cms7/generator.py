@@ -83,7 +83,7 @@ class GeneratorState:
 
     def url_for(self, name):
         return self.gen.build_url(self.targetpath, name) or \
-                self.env.undefined('url_for({!r})'.format(str(name)))
+                self.gen.env.undefined('url_for({!r})'.format(str(name)))
 
     def get_module(self, name):
         return self.gen.config.module_id[name].get_api(self)
