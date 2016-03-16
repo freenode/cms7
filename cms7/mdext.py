@@ -36,12 +36,18 @@ class CMS7TreeProcessor(Treeprocessor):
             self.fix_link(el, 'src')
 
     def run(self, root):
+        S = '<body xmlns="http://www.w3.org/1999/xhtml">'
+        E = '</body>'
         self.process(root)
         for i in range(len(self.markdown.htmlStash.rawHtmlBlocks)):
             html, safe = self.markdown.htmlStash.rawHtmlBlocks[i]
             tree = html5lib.parse(html)
             self.process(tree)
-            html = xml.etree.ElementTree.tostring(tree, method='html', encoding='unicode')
+            xml.etree.ElementTree.register_namespace('', 'http://www.w3.org/1999/xhtml')
+            body = tree.find('{http://www.w3.org/1999/xhtml}body')
+            html = xml.etree.ElementTree.tostring(body, method='html', encoding='unicode')
+            assert html.startswith(S) and html.endswith(E)
+            html = html[len(S):-len(E)]
             self.markdown.htmlStash.rawHtmlBlocks[i] = html, safe
 
     def fix_link(self, element, attribute):
