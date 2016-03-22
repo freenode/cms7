@@ -2,12 +2,12 @@ from setuptools import setup
 
 setup(
     name='cms7',
-    version='0.1a1',
+    version='0.1a3',
     description='Simple static site generator',
     author='Ed Kellett',
     author_email='e@kellett.im',
-    url='',
-    packages=['cms7'],
+    url='https://github.com/edk0/cms7',
+    packages=['cms7', 'cms7.modules'],
     install_requires=[
         'colorlog',
         'clize',

@@ -1,4 +1,5 @@
 from dateutil import parser
+from datetime import timezone
 
 from . import ProcessorModule
 from ..source import load_source
@@ -13,6 +14,8 @@ class Article:
         self.name = name
         self.author = meta_get_one(source, 'author')
         self.datetime = parser.parse(meta_get_one(source, 'date'))
+        if self.datetime.tzinfo is None:
+            self.datetime = self.datetime.replace(tzinfo=timezone.utc)
         self.title = meta_get_one(source, 'title')
         self.slug = meta_get_one(source, 'slug', name.name)
         self.source = source
