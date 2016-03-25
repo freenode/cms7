@@ -1,5 +1,6 @@
 from pathlib2 import PurePosixPath
 import logging
+import subprocess
 
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, ModuleLoader, StrictUndefined
 
@@ -20,6 +21,10 @@ class Generator:
                                loader=ChoiceLoader(loaders),
                                undefined=StrictUndefined,
                                extensions=['jinja2.ext.with_'])
+        try:
+            self.describe = subprocess.check_output(['git', 'describe', '--always'], universal_newlines=True).splitlines()[0]
+        except:
+            self.describe = ''
 
     def add_render(self, link, target, generator):
         self.pages[str(link)] = (target, generator)
@@ -95,5 +100,6 @@ class GeneratorState:
         template = self.gen.env.get_template(template)
         return template.render(config=self.gen.config,
                                url_for=self.url_for,
+                               git_hash=self.gen.describe,
                                get_module=self.get_module,
                                **kw)
