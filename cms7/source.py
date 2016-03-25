@@ -1,5 +1,6 @@
 from markdown import Markdown
 from markdown.extensions.meta import MetaExtension, MetaPreprocessor
+from markdown.extensions.toc import TocExtension
 from markdown.extensions.wikilinks import WikiLinkExtension
 
 from jinja2 import Markup
@@ -37,7 +38,7 @@ class MarkdownSource:
 
     def render(self, gs):
         md = Markdown(extensions=[
-            MetaExtension(), WikiLinkExtension(), CMS7Extension(gs)],
+            MetaExtension(), WikiLinkExtension(), CMS7Extension(gs), TocExtension(baselevel=2)],
             output_format='html5')
         return Markup(md.convert(self.text))
 
