@@ -14,20 +14,22 @@ logger = logging.getLogger(__name__)
 
 
 class CMS7Extension(Extension):
-    def __init__(self, gs):
+    def __init__(self, gs, baselevel=1):
         self.gs = gs
+        self.baselevel = baselevel
         super().__init__()
 
     def extendMarkdown(self, md, md_globals):
-        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs)
+        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs, self.baselevel)
 
 
 class CMS7TreeProcessor(Treeprocessor):
-    def __init__(self, md, gs):
+    def __init__(self, md, gs, baselevel):
         self.gs = gs
+        self.baselevel = baselevel
         super().__init__(md)
 
-    def process(self, root):
+    def process_links(self, root):
         for el in root.findall('.//a[@href]'):
             self.fix_link(el, 'href')
         for el in root.findall('.//{http://www.w3.org/1999/xhtml}a[@href]'):
@@ -35,14 +37,30 @@ class CMS7TreeProcessor(Treeprocessor):
         for el in root.findall('.//*[@src]'):
             self.fix_link(el, 'src')
 
+    def process_headings(self, root):
+        hl = []
+        for n in range(1, 7):
+            headings = root.findall('.//h{}'.format(n))
+            if len(headings) == 0:
+                continue
+            hl.append(headings)
+
+        for level, headings in enumerate(hl, self.baselevel):
+            tag = 'h{}'.format(level)
+            for el in headings:
+                el.tag = tag
+
     def run(self, root):
         S = '<body xmlns="http://www.w3.org/1999/xhtml">'
         E = '</body>'
-        self.process(root)
+
+        self.process_links(root)
+        self.process_headings(root)
+
         for i in range(len(self.markdown.htmlStash.rawHtmlBlocks)):
             html, safe = self.markdown.htmlStash.rawHtmlBlocks[i]
             tree = html5lib.parse(html)
-            self.process(tree)
+            self.process_links(tree)
             xml.etree.ElementTree.register_namespace('', 'http://www.w3.org/1999/xhtml')
             body = tree.find('{http://www.w3.org/1999/xhtml}body')
             html = xml.etree.ElementTree.tostring(body, method='html', encoding='unicode')

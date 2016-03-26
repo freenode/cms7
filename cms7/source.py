@@ -38,7 +38,7 @@ class MarkdownSource:
 
     def render(self, gs):
         md = Markdown(extensions=[
-            MetaExtension(), WikiLinkExtension(), CMS7Extension(gs), TocExtension(baselevel=2)],
+            MetaExtension(), WikiLinkExtension(), CMS7Extension(gs, baselevel=2), TocExtension()],
             output_format='html5')
         return Markup(md.convert(self.text))
 
