@@ -100,4 +100,4 @@ class CMS7TreeProcessor(Treeprocessor):
         element.text = hyphenate(element.text) if element.text else None
         for child in element:
             self.hyphenate(child)
-            element.tail = hyphenate(element.tail) if element.tail else None
+            child.tail = hyphenate(child.tail) if child.tail else None
