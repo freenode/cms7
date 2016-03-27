@@ -8,6 +8,7 @@ import html5lib
 import xml.etree
 
 from .error import CMS7Error
+from .util import hyphenate
 
 import logging
 logger = logging.getLogger(__name__)
@@ -50,17 +51,29 @@ class CMS7TreeProcessor(Treeprocessor):
             for el in headings:
                 el.tag = tag
 
+    def process_hyphens(self, root):
+        for el in root:
+            tag = el.tag
+            if tag.startswith('{http://www.w3.org/1999/xhtml}'):
+                tag = tag[len('{http://www.w3.org/1999/xhtml}'):]
+            if tag in ('p', 'li'):
+                self.hyphenate(el)
+                continue
+            self.process_hyphens(el)
+
     def run(self, root):
         S = '<body xmlns="http://www.w3.org/1999/xhtml">'
         E = '</body>'
 
         self.process_links(root)
         self.process_headings(root)
+        self.process_hyphens(root)
 
         for i in range(len(self.markdown.htmlStash.rawHtmlBlocks)):
             html, safe = self.markdown.htmlStash.rawHtmlBlocks[i]
             tree = html5lib.parse(html)
             self.process_links(tree)
+            self.process_hyphens(tree)
             xml.etree.ElementTree.register_namespace('', 'http://www.w3.org/1999/xhtml')
             body = tree.find('{http://www.w3.org/1999/xhtml}body')
             html = xml.etree.ElementTree.tostring(body, method='html', encoding='unicode')
@@ -82,3 +95,9 @@ class CMS7TreeProcessor(Treeprocessor):
             raise CMS7Error("can't resolve relative URL: {}".format(at))
         at = urlunparse(('', '', str(link), url.params, url.query, url.fragment))
         element.attrib[attribute] = at
+
+    def hyphenate(self, element):
+        element.text = hyphenate(element.text) if element.text else None
+        for child in element:
+            self.hyphenate(child)
+            element.tail = hyphenate(element.tail) if element.tail else None

@@ -2,15 +2,18 @@
 General utilities
 """
 
+import re
+
 from urllib.parse import urlparse
 
 from .error import CMS7Error
-from .source import MarkdownSource
+from .hyphenate import hyphenate_word
 
 _NOTHING = object()
 
 
 def meta_get_one(md, key, default=_NOTHING):
+    from .source import MarkdownSource
     source = None
     if isinstance(md, MarkdownSource):
         source = md
@@ -32,3 +35,17 @@ def is_relative_url(url):
     if url.path == '':
         return False
     return True
+
+
+WORD_RE = re.compile(r"[A-Za-z0-9'-]+")
+
+def _hyphenate(text):
+    le = 0
+    for match in WORD_RE.finditer(text):
+        yield text[le:match.start()]
+        le = match.end()
+        yield '\u00ad'.join(hyphenate_word(match.group()))
+    yield text[le:]
+
+def hyphenate(text):
+    return ''.join(_hyphenate(text))
