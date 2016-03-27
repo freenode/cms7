@@ -6,6 +6,8 @@ import re
 
 from urllib.parse import urlparse
 
+from markdown.util import ETX, STX
+
 from .error import CMS7Error
 from .hyphenate import hyphenate_word
 
@@ -41,10 +43,29 @@ WORD_RE = re.compile(r"[A-Za-z0-9'-]+")
 
 def _hyphenate(text):
     le = 0
+    quoted = False
     for match in WORD_RE.finditer(text):
-        yield text[le:match.start()]
+        plain = text[le:match.start()]
         le = match.end()
-        yield '\u00ad'.join(hyphenate_word(match.group()))
+        yield plain
+
+        """
+        python-markdown uses STX...ETX pairs to demarcate magical processing
+        tokens. we avoid messing those up here by keeping track of which of
+        the two special characters we last saw.
+        we never have to deal with them inside the match, since WORD_RE can't
+        match them.
+        """
+        stx, etx = plain.rfind(STX), plain.rfind(ETX)
+        if stx > etx:
+            quoted = True
+        elif etx > -1:
+            quoted = False
+
+        if not quoted:
+            yield '\u00ad'.join(hyphenate_word(match.group()))
+        else:
+            yield match.group()
     yield text[le:]
 
 def hyphenate(text):
