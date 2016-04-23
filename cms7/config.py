@@ -85,7 +85,7 @@ class Config:
                     pattern = r.get('pattern', '*')
                 except KeyError as e:
                     raise CMS7Error('resource missing required key {}'.format(e.args[0])) from e
-                self.resources.append(Resource(self, command, source, output, suffix, recursive, pattern))
+                self.resources.append(Resource(self, command, dir_, source, output, suffix, recursive, pattern))
 
             self.module_id = {}
 

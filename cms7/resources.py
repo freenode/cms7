@@ -6,9 +6,10 @@ from .error import CMS7Error
 logger = logging.getLogger(__name__)
 
 class Resource:
-    def __init__(self, config, command, source, output, suffix=None, recursive=False, pattern='*'):
+    def __init__(self, config, command, root, source, output, suffix=None, recursive=False, pattern='*'):
         self.config = config
         self.command = command
+        self.root = root
         self.source = source
         self.output = output
         self.suffix = suffix
@@ -19,7 +20,8 @@ class Resource:
         self.prepare()
 
     def prepare(self):
-        l = list(self.source.iterdir())
+        top = self.root / self.source
+        l = list(top.iterdir())
         while len(l) > 0:
             f = l.pop(0)
             if f.is_dir():
@@ -28,10 +30,11 @@ class Resource:
                 continue
             if not f.match(self.pattern):
                 continue
-            dest = self.output / f.relative_to(self.source)
+            dest = self.root / self.output / f.relative_to(top)
             if self.suffix is not None:
                 dest = dest.with_suffix(self.suffix)
-            self.map_[str(f)] = (f, dest)
+            self.map_[str(f.relative_to(self.root))] = (f, dest.relative_to(self.root))
+        print(self.map_)
 
     def run(self):
         for f, dest in self.map_.values():
