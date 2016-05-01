@@ -97,6 +97,11 @@ class CMS7TreeProcessor(Treeprocessor):
         element.attrib[attribute] = at
 
     def hyphenate(self, element):
+        tag = element.tag
+        if tag.startswith('{http://www.w3.org/1999/xhtml}'):
+            tag = tag[len('{http://www.w3.org/1999/xhtml}'):]
+        if tag in ('code', 'pre'):
+            return
         element.text = hyphenate(element.text) if element.text else None
         for child in element:
             self.hyphenate(child)
