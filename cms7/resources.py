@@ -34,7 +34,6 @@ class Resource:
             if self.suffix is not None:
                 dest = dest.with_suffix(self.suffix)
             self.map_[str(f.relative_to(self.root))] = (f, dest.relative_to(self.root))
-        print(self.map_)
 
     def run(self):
         for f, dest in self.map_.values():
