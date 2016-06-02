@@ -35,7 +35,7 @@ class Generator:
         try:
             target = self.pages[str(name)][0]
             logger.debug('look up for %s: rendered output: %s', name, target)
-            suffix = '.html'
+            suffix = target.suffix or '.html'
         except KeyError:
             for r in self.config.resources:
                 t = r.lookup_target(str(name))
@@ -69,7 +69,7 @@ class Generator:
     def run(self):
         for link, v in sorted(self.pages.items(), key=lambda x: str(x[0])):
             target, generator = v
-            tf = target.with_suffix('.html')
+            tf = target.with_suffix(target.suffix or '.html')
             logger.info('Rendering %s -> %s', link, tf)
             try:
                 data = generator(GeneratorState(self, target))
@@ -78,7 +78,7 @@ class Generator:
                 raise
             except Exception as e:
                 raise CMS7Error('{} while rendering {!r}'.format(type(e).__name__, link)) from e
-            with self.open_target(target.with_suffix('.html')) as f:
+            with self.open_target(tf) as f:
                 f.write(data)
 
 
