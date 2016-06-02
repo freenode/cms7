@@ -9,6 +9,7 @@ from .util import is_relative_url
 
 logger = logging.getLogger(__name__)
 
+
 class Generator:
     def __init__(self, config):
         self.config = config
@@ -29,8 +30,11 @@ class Generator:
     def add_render(self, link, target, generator):
         self.pages[str(link)] = (target, generator)
 
-    def build_url(self, location, name):
-        location = location.parent
+    def build_url(self, location, name, absolute=False):
+        if absolute:
+            location = PurePosixPath('')
+        else:
+            location = location.parent
         suffix = None
         try:
             target = self.pages[str(name)][0]
@@ -56,9 +60,11 @@ class Generator:
         if suffix is not None:
             p = p.with_suffix(suffix)
         if p.name == 'index.html':
-            return p.parent / '.'
-        if p.suffix == '.html' and self.config.htmlless:
+            p = p.parent / '.'
+        elif p.suffix == '.html' and self.config.htmlless:
             p = p.with_suffix('')
+        if absolute:
+            return self.config.absolute_url + str(p)
         return p
 
     def open_target(self, path):
@@ -87,10 +93,10 @@ class GeneratorState:
         self.gen = gen
         self.targetpath = targetpath
 
-    def url_for(self, name, *, ignore_absolute=False):
+    def url_for(self, name, *, absolute=False, ignore_absolute=False):
         if ignore_absolute and not is_relative_url(str(name)):
             return name
-        return self.gen.build_url(self.targetpath, name) or \
+        return self.gen.build_url(self.targetpath, name, absolute=absolute) or \
                 self.gen.env.undefined('url_for({!r})'.format(str(name)))
 
     def get_module(self, name):

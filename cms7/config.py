@@ -69,6 +69,10 @@ class Config:
 
             self.htmlless = data.get('pretty-html', False)
 
+            self.absolute_url = data.get('absolute-url')
+            if self.absolute_url is None:
+                logger.warning("absolute-url is not set, some modules won't work.")
+
             if 'compiled-theme' in data:
                 self.compiled_theme = dir_ / data['compiled-theme']
             else:
