@@ -15,25 +15,27 @@ logger = logging.getLogger(__name__)
 
 
 class CMS7Extension(Extension):
-    def __init__(self, gs, baselevel=1):
+    def __init__(self, gs, *, baselevel=1, hyphenate=True, paragraphs=None):
         self.gs = gs
         self.baselevel = baselevel
+        self.hyphenate = hyphenate
+        self.paragraphs = paragraphs
         super().__init__()
 
     def extendMarkdown(self, md, md_globals):
-        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs, self.baselevel)
+        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs, self.baselevel, self.hyphenate, self.paragraphs)
 
 
 class CMS7TreeProcessor(Treeprocessor):
-    def __init__(self, md, gs, baselevel):
+    def __init__(self, md, gs, baselevel, hyphenate, paragraphs):
         self.gs = gs
         self.baselevel = baselevel
+        self.hyphens = hyphenate
+        self.paragraphs = paragraphs
         super().__init__(md)
 
     def process_links(self, root):
         for el in root.findall('.//a[@href]'):
-            self.fix_link(el, 'href')
-        for el in root.findall('.//{http://www.w3.org/1999/xhtml}a[@href]'):
             self.fix_link(el, 'href')
         for el in root.findall('.//*[@src]'):
             self.fix_link(el, 'src')
@@ -54,32 +56,43 @@ class CMS7TreeProcessor(Treeprocessor):
     def process_hyphens(self, root):
         for el in root:
             tag = el.tag
-            if tag.startswith('{http://www.w3.org/1999/xhtml}'):
-                tag = tag[len('{http://www.w3.org/1999/xhtml}'):]
             if tag in ('p', 'li'):
                 self.hyphenate(el)
                 continue
             self.process_hyphens(el)
 
     def run(self, root):
-        S = '<body xmlns="http://www.w3.org/1999/xhtml">'
+        S = '<body>'
         E = '</body>'
 
         self.process_links(root)
         self.process_headings(root)
-        self.process_hyphens(root)
+
+        if self.hyphens:
+            self.process_hyphens(root)
 
         for i in range(len(self.markdown.htmlStash.rawHtmlBlocks)):
             html, safe = self.markdown.htmlStash.rawHtmlBlocks[i]
-            tree = html5lib.parse(html)
+            tree = html5lib.parse(html, namespaceHTMLElements=False)
             self.process_links(tree)
-            self.process_hyphens(tree)
-            xml.etree.ElementTree.register_namespace('', 'http://www.w3.org/1999/xhtml')
-            body = tree.find('{http://www.w3.org/1999/xhtml}body')
+            if self.hyphens:
+                self.process_hyphens(tree)
+            body = tree.find('body')
             html = xml.etree.ElementTree.tostring(body, method='html', encoding='unicode')
             assert html.startswith(S) and html.endswith(E)
             html = html[len(S):-len(E)]
             self.markdown.htmlStash.rawHtmlBlocks[i] = html, safe
+
+        if self.paragraphs is not None:
+            children = list(root)
+            count = 0
+            stop = False
+            for child in children:
+                count += 1
+                if child.tag != 'p':
+                    stop = True
+                if stop or count > self.paragraphs:
+                    root.remove(child)
 
     def fix_link(self, element, attribute):
         at = element.attrib[attribute]
@@ -98,8 +111,6 @@ class CMS7TreeProcessor(Treeprocessor):
 
     def hyphenate(self, element):
         tag = element.tag
-        if tag.startswith('{http://www.w3.org/1999/xhtml}'):
-            tag = tag[len('{http://www.w3.org/1999/xhtml}'):]
         if tag in ('code', 'pre'):
             return
         element.text = hyphenate(element.text) if element.text else None

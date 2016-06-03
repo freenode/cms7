@@ -37,12 +37,12 @@ class MarkdownSource:
         mp.run(self.text.split('\n'))
         return ns.Meta
 
-    def render(self, gs):
+    def render(self, gs, *, baselevel=2, hyphenate=True, paragraphs=None):
         md = Markdown(extensions=[
                 MetaExtension(),
                 TableExtension(),
                 WikiLinkExtension(),
-                CMS7Extension(gs, baselevel=2),
+                CMS7Extension(gs, baselevel=baselevel, hyphenate=hyphenate, paragraphs=paragraphs),
                 TocExtension()
             ],
             output_format='html5')
