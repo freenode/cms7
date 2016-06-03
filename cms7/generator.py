@@ -92,6 +92,12 @@ class GeneratorState:
     def __init__(self, gen, targetpath):
         self.gen = gen
         self.targetpath = targetpath
+        self.absolute = False
+
+    def with_absolute(self):
+        me = self.__class__(self.gen, self.targetpath)
+        me.absolute = True
+        return me
 
     def url_for(self, name, *, absolute=False, ignore_absolute=False):
         if ignore_absolute and not is_relative_url(str(name)):

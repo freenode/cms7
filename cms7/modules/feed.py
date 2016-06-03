@@ -18,6 +18,8 @@ class Feed:
         self.ftype = ftype
 
     def render(self, gs):
+        gs = gs.with_absolute()
+
         blog = self.parent.blog.get_api(gs)
         feed = self.ftype(self.parent.title, gs.url_for(self.name, absolute=True), self.parent.description)
 
