@@ -19,7 +19,7 @@ class Feed:
 
     def render(self, gs):
         blog = self.parent.blog.get_api(gs)
-        feed = self.ftype(self.parent.cfg['title'], gs.url_for(self.name, absolute=True), self.parent.cfg['description'])
+        feed = self.ftype(self.parent.title, gs.url_for(self.name, absolute=True), self.parent.description)
 
         for a in reversed(blog.articles[-15:]):
             text = a.source.render(gs, paragraphs=3, hyphenate=False)
@@ -32,13 +32,11 @@ class Feed:
 
 
 class FeedModule(Module):
-    def __init__(self, *a, module, output, **kw):
-        self.cfg = {}
-        self.cfg['title'] = kw.pop('title')
-        self.cfg['link'] = kw.pop('link')
-        self.cfg['description'] = kw.pop('description')
-
+    def __init__(self, *a, title, description, module, output, **kw):
         super().__init__(*a, **kw)
+
+        self.title = title
+        self.description = description
 
         self.blog = self.config.module_id[module]
 
