@@ -12,16 +12,17 @@ from ..util import meta_get_one
 
 
 class Feed:
-    def __init__(self, parent, ftype):
+    def __init__(self, parent, name, ftype):
         self.parent = parent
+        self.name = name
         self.ftype = ftype
 
     def render(self, gs):
         blog = self.parent.blog.get_api(gs)
-        feed = self.ftype(self.parent.cfg['title'], self.parent.cfg['link'], self.parent.cfg['description'])
+        feed = self.ftype(self.parent.cfg['title'], gs.url_for(self.name, absolute=True), self.parent.cfg['description'])
 
         for a in blog.articles[-15:]:
-            feed.add_item(a.title, 'TODO', a.source.text, author_name=a.author)
+            feed.add_item(a.title, gs.url_for(a.name, absolute=True), a.source.text, author_name=a.author)
 
         return feed.writeString('utf-8') + '\n'
 
@@ -44,6 +45,6 @@ class FeedModule(Module):
 
     def run(self, gen):
         gen.add_render(self.output / 'atom', self.output / 'atom.xml',
-                       Feed(self, Atom1Feed).render)
+                       Feed(self, self.output / 'atom', Atom1Feed).render)
         gen.add_render(self.output / 'rss', self.output / 'rss.xml',
-                       Feed(self, Rss201rev2Feed).render)
+                       Feed(self, self.output / 'rss', Rss201rev2Feed).render)
