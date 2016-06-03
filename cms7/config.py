@@ -7,6 +7,7 @@ from .modules.blog import Blog
 from .modules.faq import Faq
 from .modules.null import Null
 from .modules.pages import Pages
+from .modules.feed import FeedModule
 
 import logging
 import yaml
@@ -22,6 +23,7 @@ _MODULES = {
     'faq': Faq,
     'null': Null,
     'pages': Pages,
+    'feed': FeedModule,
 }
 
 
