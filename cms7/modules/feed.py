@@ -21,7 +21,7 @@ class Feed:
         blog = self.parent.blog.get_api(gs)
         feed = self.ftype(self.parent.cfg['title'], gs.url_for(self.name, absolute=True), self.parent.cfg['description'])
 
-        for a in blog.articles[-15:]:
+        for a in reversed(blog.articles[-15:]):
             text = a.source.render(gs, paragraphs=3, hyphenate=False)
             feed.add_item(a.title, gs.url_for(a.name, absolute=True), text, author_name=a.author)
 
