@@ -37,6 +37,8 @@ class FeedModule(Module):
     def __init__(self, *a, title, description, module, output, **kw):
         super().__init__(*a, **kw)
 
+        self._info = {}
+
         self.title = title
         self.description = description
 
@@ -48,15 +50,17 @@ class FeedModule(Module):
         self.output = PurePosixPath(output)
 
     def enclosure_info(self, url):
-        response = requests.head(url)
-        if response.status_code != 200 or 'content-length' not in response.headers:
-            response = requests.get(url, stream=True)
-        if 'content-length' in response.headers:
-            length = response.headers['content-length']
-        else:
-            length = '0'
-            self.log(logging.WARNING, "Server for %r doesn't report content length!", url)
-        return Enclosure(url, length, response.headers['content-type'])
+        if url not in self._info:
+            response = requests.head(url)
+            if response.status_code != 200 or 'content-length' not in response.headers:
+                response = requests.get(url, stream=True)
+            if 'content-length' in response.headers:
+                length = response.headers['content-length']
+            else:
+                length = '0'
+                self.log(logging.WARNING, "Server for %r doesn't report content length!", url)
+            self._info[url] = Enclosure(url, length, response.headers['content-type'])
+        return self._info[url]
 
     def run(self, gen):
         gen.add_render(self.output / 'atom', self.output / 'atom.xml',
