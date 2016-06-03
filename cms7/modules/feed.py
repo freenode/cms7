@@ -1,7 +1,7 @@
 import logging
 
+import requests
 from pathlib2 import PurePosixPath
-
 from feedgenerator.django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed, Enclosure
 
 from . import Module
@@ -23,7 +23,10 @@ class Feed:
 
         for a in reversed(blog.articles[-15:]):
             text = a.source.render(gs, paragraphs=3, hyphenate=False)
-            feed.add_item(a.title, gs.url_for(a.name, absolute=True), text, author_name=a.author)
+            enclosure = meta_get_one(a.source, 'enclosure', None)
+            if enclosure:
+                enclosure = self.parent.enclosure_info(enclosure)
+            feed.add_item(a.title, gs.url_for(a.name, absolute=True), text, author_name=a.author, enclosure=enclosure)
 
         return feed.writeString('utf-8') + '\n'
 
@@ -43,6 +46,17 @@ class FeedModule(Module):
             self.log(logging.WARNING, "Configured with a module other than a blog. Expect errors.")
 
         self.output = PurePosixPath(output)
+
+    def enclosure_info(self, url):
+        response = requests.head(url)
+        if response.status_code != 200 or 'content-length' not in response.headers:
+            response = requests.get(url, stream=True)
+        if 'content-length' in response.headers:
+            length = response.headers['content-length']
+        else:
+            length = '0'
+            self.log(logging.WARNING, "Server for %r doesn't report content length!", url)
+        return Enclosure(url, length, response.headers['content-type'])
 
     def run(self, gen):
         gen.add_render(self.output / 'atom', self.output / 'atom.xml',

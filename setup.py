@@ -14,6 +14,7 @@ setup(
         'html5lib',
         'jinja2',
         'markdown',
+        'requests',
         'pathlib2',
         'python-dateutil',
         'pyyaml',

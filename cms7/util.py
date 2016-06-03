@@ -11,8 +11,8 @@ from markdown.util import ETX, STX
 from .error import CMS7Error
 from .hyphenate import hyphenate_word
 
-_NOTHING = object()
 
+_NOTHING = object()
 
 def meta_get_one(md, key, default=_NOTHING):
     from .source import MarkdownSource
