@@ -26,12 +26,14 @@ class Feed:
         for a in reversed(blog.articles[-15:]):
 
             summary = str(a.source.render(gs, paragraphs=3, hyphenate=False))
+            content = str(a.source.render(gs, hyphenate=False))
 
             enclosure = meta_get_one(a.source, 'enclosure', None)
             if enclosure:
                 enclosure = self.parent.enclosure_info(enclosure)
             feed.add_item(a.title, gs.url_for(a.name, absolute=True),
                           description = summary,
+                          content = content,
                           author_name=a.author,
                           enclosure=enclosure)
 
