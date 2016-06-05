@@ -11,6 +11,7 @@ setup(
     install_requires=[
         'colorlog',
         'clize',
+        'feedgenerator',
         'html5lib',
         'jinja2',
         'markdown',
