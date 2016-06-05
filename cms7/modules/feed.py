@@ -32,8 +32,9 @@ class Feed:
             if enclosure:
                 enclosure = self.parent.enclosure_info(enclosure)
             feed.add_item(a.title, gs.url_for(a.name, absolute=True),
-                          description = summary,
-                          content = content,
+                          pubdate=a.datetime,
+                          description=summary,
+                          content=content,
                           author_name=a.author,
                           enclosure=enclosure)
 
@@ -52,7 +53,7 @@ class FeedModule(Module):
         self.blog = self.config.module_id[module]
 
         if not isinstance(self.blog, Blog):
-            self.log(logging.WARNING, "Configured with a module other than a blog. Expect errors.")
+            self.log(logging.WARNING, "Configured with a target other than a blog. Expect errors.")
 
         self.output = PurePosixPath(output)
 
