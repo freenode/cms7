@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from clize import run, parameters
+from clize import run, parameters, Parameter
 
 from . import config as _config
 from .error import CMS7Error
@@ -12,21 +12,21 @@ logger = logging.getLogger('cms7')
 
 def main_(*,
           config: 'c' = 'config.yml',
-          debug:  'd' = False,
-          quiet:  'q' = False,
-          vim_is_fucking_retarded = False,
-          extra:  ('e', str, parameters.multi()) = None):
+          debug: 'd' = False,
+          extra: ('e', str, parameters.multi()) = None,
+          quiet: 'q' = False,
+          vim_is_fucking_retarded: Parameter.UNDOCUMENTED = False):
     """
     Run cms7.
 
     config: Path to project configuration
 
-    extra:  Path to additional configuration (e.g. site local overrides). Can
+    extra: Path to additional configuration (e.g. site local overrides). Can
             be specified multiple times. Later configurations override.
 
-    debug:  Print obnoxious debugging output
+    debug: Print obnoxious debugging output
 
-    quiet:  Only ever print warnings
+    quiet: Only ever print warnings
     """
 
     rl = logging.getLogger()
