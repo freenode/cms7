@@ -14,6 +14,7 @@ def main_(*,
           config: 'c' = 'config.yml',
           debug:  'd' = False,
           quiet:  'q' = False,
+          vim_is_fucking_retarded = False,
           extra:  ('e', str, parameters.multi()) = None):
     """
     Run cms7.
@@ -31,6 +32,8 @@ def main_(*,
     rl = logging.getLogger()
     h = logging.StreamHandler()
     try:
+        if not sys.stdin.isatty():
+            raise Exception
         import colorlog
         h.setFormatter(colorlog.ColoredFormatter(
             "%(log_color)s%(levelname)-8s%(reset)s %(message_log_color)s%(name)s:%(message)s",
@@ -41,7 +44,7 @@ def main_(*,
                     'CRITICAL': 'red',
                 }
             }))
-    except ImportError:
+    except:
         h.setFormatter(logging.Formatter(
             "%(levelname)-8s %(name)s:%(message)s"))
     rl.addHandler(h)
@@ -49,7 +52,10 @@ def main_(*,
     if debug:
         rl.setLevel(logging.DEBUG)
     elif quiet:
-        rl.setLevel(logging.WARNING)
+        if vim_is_fucking_retarded:
+            logging.disable(logging.CRITICAL)
+        else:
+            rl.setLevel(logging.WARNING)
     else:
         rl.setLevel(logging.INFO)
 
@@ -67,6 +73,13 @@ def main_(*,
         logger.critical('%s', e.message, exc_info=debug)
         if not debug:
             logger.warning('exiting for exception. use --debug to get a traceback')
+        if vim_is_fucking_retarded:
+            exc = e.__cause__ or e.__context__ or e
+            tb = exc.__traceback__
+            while tb.tb_next:
+                tb = tb.tb_next
+            print('{frame.f_code.co_filename}:{tb.tb_lineno}: {exc.__class__.__name__}: {exc.message}'
+                      .format(frame=tb.tb_frame, tb=tb, exc=exc), file=sys.stderr)
         sys.exit(1)
     except Exception:
         logger.critical('unexpected exception', exc_info=True)
