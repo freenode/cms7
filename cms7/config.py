@@ -69,6 +69,8 @@ class Config:
             self.output.mkdir(exist_ok=True)
             logger.info('Outputting to %s', self.output.resolve())
 
+            self.optimistic = False
+
             self.htmlless = data.get('pretty-html', False)
 
             self.absolute_url = data.get('absolute-url')

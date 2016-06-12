@@ -4,7 +4,7 @@ import subprocess
 
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, ModuleLoader, StrictUndefined
 
-from .error import CMS7Error
+from .error import CMS7Error, report_error
 from .util import is_relative_url
 
 logger = logging.getLogger(__name__)
@@ -79,11 +79,15 @@ class Generator:
             logger.info('Rendering %s -> %s', link, tf)
             try:
                 data = generator(GeneratorState(self, target))
-            except CMS7Error:
+            except CMS7Error as e:
+                report_error(e)
                 logger.error('fatal error while rendering %r', link)
-                raise
+                if not self.config.optimistic:
+                    raise
             except Exception as e:
-                raise CMS7Error('{} while rendering {!r}'.format(type(e).__name__, link)) from e
+                report_error(e)
+                if not self.config.optimistic:
+                    raise CMS7Error('{} while rendering {!r}'.format(type(e).__name__, link)) from e
             with self.open_target(tf) as f:
                 f.write(data)
 

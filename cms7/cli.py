@@ -4,7 +4,7 @@ import sys
 from clize import run, parameters, Parameter
 
 from . import config as _config
-from .error import CMS7Error
+from .error import CMS7Error, report_error
 from .generator import Generator
 
 logger = logging.getLogger('cms7')
@@ -14,6 +14,7 @@ def main_(*,
           config: 'c' = 'config.yml',
           debug: 'd' = False,
           extra: ('e', str, parameters.multi()) = None,
+          optimistic = False,
           quiet: 'q' = False,
           vim_is_fucking_retarded: Parameter.UNDOCUMENTED = False):
     """
@@ -21,10 +22,12 @@ def main_(*,
 
     config: Path to project configuration
 
-    extra: Path to additional configuration (e.g. site local overrides). Can
-            be specified multiple times. Later configurations override.
-
     debug: Print obnoxious debugging output
+
+    extra: Path to additional configuration (e.g. site local overrides). Can
+           be specified multiple times. Later configurations override.
+
+    optimistic: Try to continue processing after rendering errors
 
     quiet: Only ever print warnings
     """
@@ -49,11 +52,14 @@ def main_(*,
             "%(levelname)-8s %(name)s:%(message)s"))
     rl.addHandler(h)
 
+    if vim_is_fucking_retarded:
+        report_error.quiet = False
+
     if debug:
         rl.setLevel(logging.DEBUG)
     elif quiet:
         if vim_is_fucking_retarded:
-            logging.disable(logging.CRITICAL)
+            rl.setLevel(logging.CRITICAL + 1)
         else:
             rl.setLevel(logging.WARNING)
     else:
@@ -61,6 +67,8 @@ def main_(*,
 
     try:
         cfg = _config.load(config, *extra)
+        if optimistic:
+            cfg.optimistic = True
         gen = Generator(cfg)
         for m in cfg.modules():
             m.prepare()
@@ -73,13 +81,6 @@ def main_(*,
         logger.critical('%s', e.message, exc_info=debug)
         if not debug:
             logger.warning('exiting for exception. use --debug to get a traceback')
-        if vim_is_fucking_retarded:
-            exc = e.__cause__ or e.__context__ or e
-            tb = exc.__traceback__
-            while tb.tb_next:
-                tb = tb.tb_next
-            print('{frame.f_code.co_filename}:{tb.tb_lineno}: {exc.__class__.__name__}: {exc.message}'
-                      .format(frame=tb.tb_frame, tb=tb, exc=exc), file=sys.stderr)
         sys.exit(1)
     except Exception:
         logger.critical('unexpected exception', exc_info=True)
