@@ -42,7 +42,7 @@ class MarkdownSource:
                 MetaExtension(),
                 TableExtension(),
                 WikiLinkExtension(),
-                CMS7Extension(gs, baselevel=baselevel, hyphenate=hyphenate, paragraphs=paragraphs),
+                CMS7Extension(gs, path=self.source, baselevel=baselevel, hyphenate=hyphenate, paragraphs=paragraphs),
                 TocExtension()
             ],
             output_format='html5')

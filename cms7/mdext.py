@@ -15,20 +15,22 @@ logger = logging.getLogger(__name__)
 
 
 class CMS7Extension(Extension):
-    def __init__(self, gs, *, baselevel=1, hyphenate=True, paragraphs=None):
+    def __init__(self, gs, *, path=None, baselevel=1, hyphenate=True, paragraphs=None):
         self.gs = gs
+        self.path = path
         self.baselevel = baselevel
         self.hyphenate = hyphenate
         self.paragraphs = paragraphs
         super().__init__()
 
     def extendMarkdown(self, md, md_globals):
-        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs, self.baselevel, self.hyphenate, self.paragraphs)
+        md.treeprocessors['cms7processor'] = CMS7TreeProcessor(md, self.gs, self.path, self.baselevel, self.hyphenate, self.paragraphs)
 
 
 class CMS7TreeProcessor(Treeprocessor):
-    def __init__(self, md, gs, baselevel, hyphenate, paragraphs):
+    def __init__(self, md, gs, path, baselevel, hyphenate, paragraphs):
         self.gs = gs
+        self.path = path
         self.baselevel = baselevel
         self.hyphens = hyphenate
         self.paragraphs = paragraphs
@@ -105,7 +107,7 @@ class CMS7TreeProcessor(Treeprocessor):
             return
         link = self.gs.gen.build_url(self.gs.targetpath, url.path)
         if link is None:
-            raise CMS7Error("can't resolve relative URL: {}".format(at))
+            raise CMS7Error("can't resolve relative URL: {}".format(at), self.path)
         at = urlunparse(('', '', str(link), url.params, url.query, url.fragment))
         element.attrib[attribute] = at
 

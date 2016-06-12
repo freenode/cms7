@@ -16,8 +16,11 @@ def report_error(exc):
     tb = exc.__traceback__
     while tb.tb_next:
         tb = tb.tb_next
-    filename = exc.filename
-    lineno = tb.tb_lineno
+    filename = exc.filename or tb.tb_frame.f_code.co_filename
+    if not exc.filename:
+        lineno = tb.tb_lineno
+    else:
+        lineno = 0
     desc = (filename, lineno, exc.__class__.__name__, exc.message)
     if desc in report_error.errors:
         return
