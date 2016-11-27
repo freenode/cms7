@@ -37,7 +37,7 @@ class MarkdownSource:
         mp.run(self.text.split('\n'))
         return ns.Meta
 
-    def render(self, gs, *, baselevel=2, hyphenate=True, paragraphs=None):
+    def render(self, gs, *, baselevel=2, hyphenate=False, paragraphs=None):
         md = Markdown(extensions=[
                 MetaExtension(),
                 TableExtension(),
