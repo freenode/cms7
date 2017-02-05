@@ -30,8 +30,8 @@ class Generator:
     def add_render(self, link, target, generator):
         self.pages[str(link)] = (target, generator)
 
-    def build_url(self, location, name, absolute=False):
-        if absolute:
+    def build_url(self, location, name, absolute=False, path_absolute=False):
+        if absolute or path_absolute:
             location = PurePosixPath('')
         else:
             location = location.parent
@@ -65,6 +65,8 @@ class Generator:
             p = p.with_suffix('')
         if absolute:
             return self.config.absolute_url + str(p)
+        elif path_absolute:
+            return '/' + str(p)
         return p
 
     def open_target(self, path):
@@ -97,16 +99,23 @@ class GeneratorState:
         self.gen = gen
         self.targetpath = targetpath
         self.absolute = False
+        self.path_absolute = False
 
     def with_absolute(self):
         me = self.__class__(self.gen, self.targetpath)
         me.absolute = True
         return me
 
+    def with_path_absolute(self):
+        me = self.__class__(self.gen, self.targetpath)
+        me.path_absolute = True
+        return me
+
     def url_for(self, name, *, absolute=False, ignore_absolute=False):
         if ignore_absolute and not is_relative_url(str(name)):
             return name
-        return self.gen.build_url(self.targetpath, name, absolute=absolute) or \
+        absolute = absolute or self.absolute
+        return self.gen.build_url(self.targetpath, name, absolute=absolute, path_absolute=self.path_absolute) or \
                 self.gen.env.undefined('url_for({!r})'.format(str(name)))
 
     def get_module(self, name):
