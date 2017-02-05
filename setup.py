@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cms7',
-    version='0.1a18',
+    version='0.1a19',
     description='Simple static site generator',
     author='Ed Kellett',
     author_email='e@kellett.im',
