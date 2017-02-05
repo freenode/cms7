@@ -5,13 +5,17 @@ from ..util import meta_get_one
 
 class Page:
     def __init__(self, parent, name, source):
+        self.parent = parent
         self.source = source
         self.name = name
         self.slug = meta_get_one(source, 'slug', name.name)
         self.title = meta_get_one(source, 'title')
         self.template = meta_get_one(source, 'template', 'page.html')
+        self.absolute = meta_get_one(source, 'absolute', False)
 
     def render(self, gs):
+        if self.absolute is not False:
+            gs = gs.with_path_absolute()
         self.content = self.source.render(gs)
         return gs.render_template(self.template, title=self.title, page=self)
 
