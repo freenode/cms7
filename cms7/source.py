@@ -43,7 +43,7 @@ class MarkdownSource:
                 TableExtension(),
                 WikiLinkExtension(),
                 CMS7Extension(gs, path=self.source, baselevel=baselevel, hyphenate=hyphenate, paragraphs=paragraphs),
-                TocExtension()
+                TocExtension(anchorlink=True)
             ],
             output_format='html5')
         return Markup(md.convert(self.text))
