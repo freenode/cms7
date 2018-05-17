@@ -1,14 +1,14 @@
 # cms7
 
 A small and simple static site generator designed for rendering freenode's
-shiny new website, when it exists.
+shiny new website.
 
 ## Installation
 
 In a **python 3** environment (tested against 3.4 and 3.5):
 
 ```console
-pip install -e git+https://github.com/edk0/cms7.git#egg=cms7`
+pip install cms7
 ```
 
 Alternatively, just check out this repo and `pip install -e .` here.
