@@ -1,0 +1,12 @@
+language: python
+python: "3.5"
+script:
+  - true
+deploy:
+  provider: pypi
+  user: "freenode"
+  password: $PYPI_PASS
+  on:
+    tags: true
+notifications:
+  email: false
