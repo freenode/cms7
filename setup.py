@@ -8,6 +8,7 @@ setup(
     version='0.1a21',
     description='Simple static site generator',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Ed Kellett',
     author_email='e@kellett.im',
     url='https://github.com/freenode/cms7',
