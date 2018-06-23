@@ -1,9 +1,13 @@
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='cms7',
-    version='0.1a20',
+    version='0.1a21',
     description='Simple static site generator',
+    long_description=long_description,
     author='Ed Kellett',
     author_email='e@kellett.im',
     url='https://github.com/freenode/cms7',
