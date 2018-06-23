@@ -15,6 +15,7 @@ class FaqEntry:
         self.slug = meta_get_one(source, 'slug', name.name)
         self.template = meta_get_one(source, 'template', 'faq.html')
         self.source = source
+        self.robots = meta_get_one(source, 'robots', None)
 
     def render(self, gs):
         this = FaqEntryWrapper(gs, self)

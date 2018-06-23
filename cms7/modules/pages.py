@@ -12,6 +12,7 @@ class Page:
         self.title = meta_get_one(source, 'title')
         self.template = meta_get_one(source, 'template', 'page.html')
         self.absolute = meta_get_one(source, 'absolute', False)
+        self.robots = meta_get_one(source, 'robots', None)
 
     def render(self, gs):
         if self.absolute is not False:

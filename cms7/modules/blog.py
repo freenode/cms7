@@ -19,6 +19,7 @@ class Article:
         self.title = meta_get_one(source, 'title')
         self.slug = meta_get_one(source, 'slug', name.name)
         self.source = source
+        self.robots = meta_get_one(source, 'robots', None)
 
     def render(self, gs):
         this = ArticleWrapper(gs, self)
